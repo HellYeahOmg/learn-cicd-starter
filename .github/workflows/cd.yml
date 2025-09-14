@@ -12,9 +12,15 @@ jobs:
       contents: "read"
       id-token: "write"
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+
+      - name: Install goose
+        run: go install github.com/pressly/goose/v3/cmd/goose@latest
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -23,6 +29,9 @@ jobs:
 
       - name: Build go project
         run: ./scripts/buildprod.sh
+
+      - name: DB Migrate
+        run: ./scripts/migrateup.sh
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
